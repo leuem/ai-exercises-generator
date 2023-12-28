@@ -4,7 +4,7 @@ import {
   IServerResponce,
   IUser,
   IUserPostsResponse,
-} from '../../interfaces/dummy';
+} from '../../interfaces/dummy';  
 
 export const dummyApi = createApi({
   reducerPath: 'dummy',
