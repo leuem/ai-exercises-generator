@@ -1,20 +1,25 @@
-import {
-  VStack,
-  Button,
-  CardBody,
-  Card,
-  Text,
-  Spinner,
-} from '@chakra-ui/react';
+import { VStack, Spinner } from '@chakra-ui/react';
 import { useCompleteChatMutation } from './store/gpt-api/gpt.api';
 import ExerciseForm from './components/ExerciseForm';
 import './index.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { SentenceInput } from './components/SentenceInput';
+import { sampleData } from './store/answer-sample';
+import { shuffleArray } from './utils/shuffleArray';
+import { ExerciseSentenceInput } from './components/ExerciseSentenceInput';
+import { ISentence } from './interfaces/sentence-with-input';
+import { sampleData2 } from './store/answer-sample2';
 
 function App() {
   const [sendMessage, { isSuccess, isLoading, data }] = useCompleteChatMutation(
     { fixedCacheKey: 'shared-AI-answer' }
   );
+  const [parsedData, setParsedData] = useState<ISentence[]>([
+    {
+      sentence: '',
+      answer: '',
+    },
+  ]);
 
   function handleSendMessage() {
     sendMessage({
@@ -30,38 +35,19 @@ function App() {
     });
   }
 
-  // useEffect(() => {
-  //   console.log(isLoading);
-  //   console.log(isSuccess);
-  //   console.log(data);
-  // }, [isLoading, isSuccess, data]);
+  useEffect(() => {
+    if (isSuccess && data) {
+      setParsedData(JSON.parse(data.choices[0].message.content));
+    }
+  }, [isSuccess]);
 
   return (
-    <VStack
-      minHeight={'100vh'}
-      justifyContent={'center'}
-      maxW={'80%'}
-      m={'0 auto'}
-    >
-      <Button
-        variant={'outline'}
-        colorScheme={'telegram'}
-        onClick={handleSendMessage}
-      >
-        Generate the exericse!
-      </Button>
-      <Button variant={'solid'} size={'lg'}>
-        Click me!
-      </Button>
+    <VStack minHeight={'100vh'} m={'0 auto'} maxW={'800px'}>
       <ExerciseForm />
-      {isLoading ? <Spinner /> : null}
-      {isSuccess ? (
-        <Card>
-          <CardBody>
-            <Text>{data?.choices[0].message.content}</Text>
-          </CardBody>
-        </Card>
+      {isSuccess && data && parsedData ? (
+        <ExerciseSentenceInput sentenceList={parsedData} />
       ) : null}
+      <ExerciseSentenceInput sentenceList={sampleData2} />
     </VStack>
   );
 }

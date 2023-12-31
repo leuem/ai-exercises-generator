@@ -10,6 +10,7 @@ import {
   Input,
   VStack,
   Select,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { useCompleteChatMutation } from '../store/gpt-api/gpt.api';
@@ -30,10 +31,13 @@ function ExerciseForm() {
     wordList: '',
     learnerLevel: LEARNER_LEVEL.B1,
   });
+  const [parsedData, setParsedData] = useState();
 
-  const [sendMessage, { isLoading }] = useCompleteChatMutation({
-    fixedCacheKey: 'shared-AI-answer',
-  });
+  const [sendMessage, { isLoading, isSuccess, data }] = useCompleteChatMutation(
+    {
+      fixedCacheKey: 'shared-AI-answer',
+    }
+  );
   function handleSendMessage() {
     sendMessage({
       content: `Hi! It's just a test`,
@@ -51,6 +55,18 @@ function ExerciseForm() {
   useEffect(() => {
     console.log(prompt);
   }, [prompt, formValues]);
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      setParsedData(JSON.parse(data.choices[0].message.content));
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (parsedData) {
+      console.log(parsedData);
+    }
+  }, [parsedData]);
 
   return (
     <Card>
@@ -116,15 +132,22 @@ function ExerciseForm() {
       </CardBody>
       <CardFooter justifyContent={'center'}>
         {' '}
-        <Button
-          variant={'outline'}
-          colorScheme={'telegram'}
-          onClick={() => sendMessage({ content: prompt })}
-          isLoading={isLoading}
-          loadingText={'Generating...'}
+        <Tooltip
+          hasArrow
+          label="It might take 5-10 seconds"
+          placement={'top'}
+          display={isLoading ? 'block' : 'none'}
         >
-          Generate the exericse!
-        </Button>
+          <Button
+            variant={'outline'}
+            colorScheme={'telegram'}
+            onClick={() => sendMessage({ content: prompt })}
+            isLoading={isLoading}
+            loadingText={'Generating...'}
+          >
+            Generate the exericse!
+          </Button>
+        </Tooltip>
       </CardFooter>
     </Card>
   );

@@ -74,7 +74,9 @@ export const useGeneratePrompt = (
     The sentence should be appropriate for ${config.learnerLevel}.
     The learners are adults from 25 to 50 years old.
     The sentences should use casual language.
-    In your reply write nothing else but the sentences.`);
+    In your reply write nothing else but JSON of this format: 
+[{ "sentence": "your generated sentence here", 
+"answer": "the unit to practice"} ...] `);
   }, [config]);
 
   return prompt;

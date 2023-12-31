@@ -19,7 +19,8 @@ export const gptApi = createApi({
         body: {
           model: 'gpt-3.5-turbo',
           messages: [{ role: 'user', content }],
-          temperature: 0.7,
+          temperature: 1,
+          max_tokens: 400,
         },
       }),
     }),
