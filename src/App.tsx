@@ -4,11 +4,16 @@ import ExerciseForm from './components/ExerciseForm';
 import './index.css';
 import { useEffect, useState } from 'react';
 import { SentenceInput } from './components/SentenceInput';
-import { sampleData } from './store/answer-sample';
+import { sampleData } from './constants/answer-sample';
 import { shuffleArray } from './utils/shuffleArray';
 import { ExerciseSentenceInput } from './components/ExerciseSentenceInput';
 import { ISentence } from './interfaces/sentence-with-input';
-import { sampleData2 } from './store/answer-sample2';
+import { sampleData2 } from './constants/answer-sample2';
+import { useSelector } from 'react-redux';
+import { IFormValues } from './interfaces/form-values';
+import { RootState } from './store/store';
+import { ExerciseSelectInput } from './components/ExerciseSelectInput';
+import { sampleDataSelect } from './constants/answer-sample-Select';
 
 function App() {
   const [sendMessage, { isSuccess, isLoading, data }] = useCompleteChatMutation(
@@ -18,8 +23,12 @@ function App() {
     {
       sentence: '',
       answer: '',
+      hint: '',
+      options: [],
     },
   ]);
+
+  const formData = useSelector((state: RootState) => state.exerciseForm);
 
   function handleSendMessage() {
     sendMessage({
@@ -41,13 +50,21 @@ function App() {
     }
   }, [isSuccess]);
 
+  // useEffect(() => {
+  //   console.log(formData);
+  // }, [formData]);
+
   return (
     <VStack minHeight={'100vh'} m={'0 auto'} maxW={'800px'}>
       <ExerciseForm />
-      {isSuccess && data && parsedData ? (
+      {isSuccess &&  parsedData && formData.taskType === "fillInGaps"? (
         <ExerciseSentenceInput sentenceList={parsedData} />
       ) : null}
-      <ExerciseSentenceInput sentenceList={sampleData2} />
+      {isSuccess &&  parsedData && formData.taskType === "multipleChoice"? (
+        <ExerciseSelectInput  sentenceList={parsedData} />
+      ) : null}
+      {/* <ExerciseSentenceInput sentenceList={sampleData2} />
+      <ExerciseSelectInput sentenceList={sampleDataSelect}/> */}
     </VStack>
   );
 }

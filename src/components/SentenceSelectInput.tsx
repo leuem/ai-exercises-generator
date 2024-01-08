@@ -1,16 +1,18 @@
-import { Input, Text } from '@chakra-ui/react';
+import { Input, Select, Text } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { ISentence } from '../interfaces/sentence-with-input';
+import { shuffleArray } from '../utils/shuffleArray';
 
-interface ISentenceInputProps {
+interface ISentenceSelectInputProps {
   sentence: ISentence;
   isCheckActive: boolean;
   onValidityChange: (isValid: boolean) => void;
 }
 
-export const SentenceInput = (props: ISentenceInputProps) => {
+export const SentenceSelectInput = (props: ISentenceSelectInputProps) => {
   const { isCheckActive, onValidityChange } = props;
   const { sentence, answer } = props.sentence;
+  const [options, setOptions] = useState<string[]>([]);
   const [value, setValue] = useState<string>('');
   const [isValid, setIsValid] = useState<boolean | null>(null);
 
@@ -31,9 +33,22 @@ export const SentenceInput = (props: ISentenceInputProps) => {
       handleValidity();
     } else {
       setIsValid(null);
-    //  setValue('');
+      //  setValue('');
     }
   }, [isCheckActive]);
+
+  useEffect(() => {
+    if (options) {
+      setValue(options[0]);
+    }
+  }, [options]);
+
+  useEffect(() => {
+    if (props.sentence.options) {
+      const arr = shuffleArray([...props.sentence.options]);
+      setOptions(arr);
+    }
+  }, [props.sentence.options]);
 
   return (
     <>
@@ -43,15 +58,16 @@ export const SentenceInput = (props: ISentenceInputProps) => {
             {part}
           </Text>
           {index < parts.length - 1 && (
-            <Input
-              type="text"
+            <Select
               size={'sm'}
-              // placeholder={answer}
-              maxW={`calc(${answer.length + 1}ch + 16px)`}
+              display={'inline-block'}
+              //placeholder={" "}
+              w={'max-content'}
               m={'0 8px 0 0'}
               boxSizing={'border-box'}
               key={`input${index}`}
               onChange={(e) => setValue(e.target.value)}
+              // defaultValue={options ? options[0] : ''}
               value={value}
               isInvalid={isValid === false ? true : false}
               borderColor={isCheckActive && isValid ? 'green.500' : 'inherit'}
@@ -60,7 +76,13 @@ export const SentenceInput = (props: ISentenceInputProps) => {
               }
               isDisabled={isCheckActive}
               _disabled={{ opacity: 1 }}
-            />
+            >
+              {options?.map((option, index) => (
+                <option value={option} key={`option${index}`}>
+                  {option}
+                </option>
+              ))}
+            </Select>
           )}
         </React.Fragment>
       ))}

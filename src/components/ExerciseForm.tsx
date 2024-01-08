@@ -15,13 +15,16 @@ import {
 import { useEffect, useState } from 'react';
 import { useCompleteChatMutation } from '../store/gpt-api/gpt.api';
 import { useGeneratePrompt } from '../utils/generatePrompt';
-import { LEARNER_LEVEL } from '../constants/prompt';
+import { LEARNER_AGE, LEARNER_LEVEL } from '../constants/prompt';
+import { useDispatch } from 'react-redux';
+import { addValues } from '../store/exercise-form/exercise-form-router';
 
 interface IFormValues {
   skill: string;
   taskType: string;
   wordList: string;
   learnerLevel: string;
+  learnerAge: string;
 }
 
 function ExerciseForm() {
@@ -29,27 +32,26 @@ function ExerciseForm() {
     skill: '',
     taskType: '',
     wordList: '',
-    learnerLevel: LEARNER_LEVEL.B1,
+    learnerLevel: '', // LEARNER_LEVEL.B1,
+    learnerAge: '', // LEARNER_AGE.adults,
   });
   const [parsedData, setParsedData] = useState();
-
+  const dispatch = useDispatch();
   const [sendMessage, { isLoading, isSuccess, data }] = useCompleteChatMutation(
     {
       fixedCacheKey: 'shared-AI-answer',
     }
   );
   function handleSendMessage() {
-    sendMessage({
-      content: `Hi! It's just a test`,
-    }).then((res) => {
-      console.log(res);
-    });
+    dispatch(addValues(formValues));
+    sendMessage({ content: prompt });
   }
   const prompt = useGeneratePrompt(
     formValues.skill,
     formValues.taskType,
     formValues.wordList,
-    formValues.learnerLevel
+    formValues.learnerLevel,
+    formValues.learnerAge
   );
 
   useEffect(() => {
@@ -97,9 +99,7 @@ function ExerciseForm() {
         >
           <HStack>
             <Radio value="fillInGaps">Fill-in-gaps</Radio>
-            <Radio value="grammar" isDisabled>
-              Matching with definition
-            </Radio>
+            <Radio value="multipleChoice">Multiple Choice</Radio>
             <Radio value="reading" isDisabled>
               Guessing the meaning
             </Radio>
@@ -118,7 +118,7 @@ function ExerciseForm() {
         />
         <Text fontSize={'lg'}>Learner's level</Text>
         <Select
-          defaultValue={'A1'}
+          defaultValue={'B1'}
           onChange={(e) =>
             setFormValues({ ...formValues, learnerLevel: e.target.value })
           }
@@ -128,6 +128,17 @@ function ExerciseForm() {
           <option value={'B1'}>Intermediate B1</option>
           <option value={'B2'}>Upper-Intermediate B2</option>
           <option value={'C1'}>Advanced C1</option>
+        </Select>
+        <Text fontSize={'lg'}>Learner's age</Text>
+        <Select
+          defaultValue={'adults'}
+          onChange={(e) =>
+            setFormValues({ ...formValues, learnerAge: e.target.value })
+          }
+        >
+          <option value={'children'}>Children 7-12 y.o.</option>
+          <option value={'teenagers'}>Teenagers 13-20 y.o.</option>
+          <option value={'adults'}>Adults 20+ y.o</option>
         </Select>
       </CardBody>
       <CardFooter justifyContent={'center'}>
@@ -141,7 +152,7 @@ function ExerciseForm() {
           <Button
             variant={'outline'}
             colorScheme={'telegram'}
-            onClick={() => sendMessage({ content: prompt })}
+            onClick={handleSendMessage}
             isLoading={isLoading}
             loadingText={'Generating...'}
           >

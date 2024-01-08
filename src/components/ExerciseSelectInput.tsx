@@ -19,12 +19,13 @@ import { SentenceInput } from './SentenceInput';
 import { useEffect, useState } from 'react';
 import { ISentence } from '../interfaces/sentence-with-input';
 import { shuffleArray } from '../utils/shuffleArray';
+import { SentenceSelectInput } from './SentenceSelectInput';
 
-interface IExerciseSentenceInput {
+interface IExerciseSelectInput {
   sentenceList: ISentence[];
 }
 
-export const ExerciseSentenceInput = (props: IExerciseSentenceInput) => {
+export const ExerciseSelectInput = (props: IExerciseSelectInput) => {
   const [exsData, setExsData] = useState<ISentence[]>(props.sentenceList);
   const [hintsList, setHintsList] = useState<string[]>(['']);
   const [isCheckActive, setIsCheckActive] = useState<boolean>(false);
@@ -62,6 +63,10 @@ export const ExerciseSentenceInput = (props: IExerciseSentenceInput) => {
     setScore(`${correctAnswersCounter} / ${qCounter}`);
   }, [validAnswersList]);
 
+  useEffect(() => {
+    console.log(exsData);
+  }, []);
+
   return (
     <Card>
       <CardHeader ml={'auto'}>
@@ -75,7 +80,7 @@ export const ExerciseSentenceInput = (props: IExerciseSentenceInput) => {
         </Button>
       </CardHeader>
       <CardBody display={'flex'} flexDirection={'column'} gap={'16px'}>
-        <HStack>
+        {/* <HStack>
           {hintsList.map((item, index) => {
             return (
               <Text
@@ -88,18 +93,17 @@ export const ExerciseSentenceInput = (props: IExerciseSentenceInput) => {
               </Text>
             );
           })}
-        </HStack>
+        </HStack> */}
         <OrderedList spacing={'4px'}>
           {exsData.map((item, index) => {
             return (
               <ListItem key={`list-${index}`}>
-                <SentenceInput
+                <SentenceSelectInput
                   sentence={item}
-                  key={`sentence-${index}`}
                   isCheckActive={isCheckActive}
-                  onValidityChange={(valid) => {
-                    handleValidityChange(index, valid);
-                  }}
+                  onValidityChange={(valid) =>
+                    handleValidityChange(index, valid)
+                  }
                 />
               </ListItem>
             );
