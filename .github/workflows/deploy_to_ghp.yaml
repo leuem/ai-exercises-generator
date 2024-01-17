@@ -3,8 +3,7 @@ name: Build and Deploy to GitHub Pages
 on:
   push:
     branches:
-      - master
-      - feature/github-pages-open-ai-connection
+      - main
 
 jobs:
   build-and-deploy:
