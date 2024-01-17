@@ -2,7 +2,10 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { IGptResponse } from '../../interfaces/responses/gpt-api';
 import { IGptRequest } from '../../interfaces/requests/gpt-api';
 
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+const apiKeyEncoded = import.meta.env.VITE_OPENAI_API_KEY;
+const apiKeyPassword = import.meta.env.VITE_OPENAI_API_KEY_PASSWORD;
+
+var CryptoJS = require("crypto-js");
 
 export const gptApi = createApi({
   reducerPath: 'api',
@@ -14,7 +17,7 @@ export const gptApi = createApi({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
+          Authorization: `Bearer` + CryptoJS.AES.decrypt(apiKeyEncoded, apiKeyPassword),
         },
         body: {
           model: 'gpt-3.5-turbo',
