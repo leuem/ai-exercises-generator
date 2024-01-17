@@ -5,7 +5,7 @@ import { IGptRequest } from '../../interfaces/requests/gpt-api';
 const apiKeyEncoded = import.meta.env.VITE_OPENAI_API_KEY;
 const apiKeyPassword = import.meta.env.VITE_OPENAI_API_KEY_PASSWORD;
 
-var CryptoJS = require("crypto-js");
+import CryptoJS from 'crypto-js'
 
 export const gptApi = createApi({
   reducerPath: 'api',
@@ -17,7 +17,7 @@ export const gptApi = createApi({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer` + CryptoJS.AES.decrypt(apiKeyEncoded, apiKeyPassword),
+          Authorization: `Bearer ` + CryptoJS.AES.decrypt(apiKeyEncoded, apiKeyPassword).toString(CryptoJS.enc.Utf8),
         },
         body: {
           model: 'gpt-3.5-turbo',
